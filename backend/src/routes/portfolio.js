@@ -3,6 +3,8 @@ const router = express.Router();
 const Portfolio = require('../models/Portfolio');
 const Transaction = require('../models/Transaction');
 const { protect } = require('../middleware/authMiddleware');
+const { transactionValidation } = require('../middleware/validation');
+const { transactionLimiter } = require('../middleware/rateLimiter');
 
 // Get current portfolio
 router.get('/', protect, async (req, res) => {
@@ -25,7 +27,7 @@ router.get('/history', protect, async (req, res) => {
 });
 
 // Execute transaction (Buy/Sell)
-router.post('/transaction', protect, async (req, res) => {
+router.post('/transaction', protect, transactionLimiter, transactionValidation, async (req, res) => {
     const { type, symbol, quantity, price } = req.body;
     const total = quantity * price;
 

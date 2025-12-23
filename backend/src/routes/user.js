@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
+const { watchlistValidation } = require('../middleware/validation');
 
 // @desc    Get user watchlist
 // @route   GET /api/user/watchlist
@@ -16,7 +17,7 @@ router.get('/watchlist', protect, async (req, res) => {
 
 // @desc    Add to watchlist
 // @route   POST /api/user/watchlist
-router.post('/watchlist', protect, async (req, res) => {
+router.post('/watchlist', protect, watchlistValidation, async (req, res) => {
     const { symbol } = req.body;
     try {
         const user = await User.findById(req.user._id);
