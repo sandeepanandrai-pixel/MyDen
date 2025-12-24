@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Layout from './components/Layout';
@@ -16,16 +16,19 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Switch>
-          <Route path="/login" component={Login} />
-          <Route path="/signup" component={Signup} />
-          <Route>
+          {/* Public routes */}
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/signup" component={Signup} />
+
+          {/* Protected routes with Layout */}
+          <Route path="/">
             <Layout>
               <Switch>
-                <PrivateRoute path="/" exact component={Dashboard} />
-                <PrivateRoute path="/market" component={Market} />
-                <PrivateRoute path="/portfolio" component={Portfolio} />
-                <PrivateRoute path="/history" component={History} />
-                <PrivateRoute path="/settings" component={Settings} />
+                <PrivateRoute exact path="/" component={Dashboard} />
+                <PrivateRoute exact path="/market" component={Market} />
+                <PrivateRoute exact path="/portfolio" component={Portfolio} />
+                <PrivateRoute exact path="/history" component={History} />
+                <PrivateRoute exact path="/settings" component={Settings} />
               </Switch>
             </Layout>
           </Route>
@@ -34,6 +37,5 @@ const App = () => {
     </AuthProvider>
   );
 };
-
 
 export default App;

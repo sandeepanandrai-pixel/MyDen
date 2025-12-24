@@ -1,18 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, Search, Bell, FileText } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 
-const SidebarItem = ({ icon: Icon, label, active, onClick }) => (
-    <div onClick={onClick} className={`flex items-center space-x-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
-        <Icon size={20} />
-        <span className="font-medium">{label}</span>
-    </div>
-);
+const SidebarItem = ({ icon: Icon, label, active, onClick, to }) => {
+    const content = (
+        <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <Icon size={20} />
+            <span className="font-medium">{label}</span>
+        </div>
+    );
+
+    // If 'to' is provided, render as Link; otherwise use div with onClick
+    if (to) {
+        return <Link to={to} className="block">{content}</Link>;
+    }
+
+    return <div onClick={onClick}>{content}</div>;
+};
 
 const Layout = ({ children }) => {
     const { logout } = useAuth();
+    const location = useLocation();
 
     return (
         <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
@@ -24,11 +34,11 @@ const Layout = ({ children }) => {
                 </div>
 
                 <nav className="flex-1 space-y-2">
-                    <Link to="/"><SidebarItem icon={LayoutDashboard} label="Dashboard" active={window.location.pathname === '/'} /></Link>
-                    <Link to="/market"><SidebarItem icon={TrendingUp} label="Market" active={window.location.pathname === '/market'} /></Link>
-                    <Link to="/portfolio"><SidebarItem icon={PieChart} label="Portfolio" active={window.location.pathname === '/portfolio'} /></Link>
-                    <Link to="/history"><SidebarItem icon={FileText} label="History" active={window.location.pathname === '/history'} /></Link>
-                    <Link to="/settings"><SidebarItem icon={Settings} label="Settings" active={window.location.pathname === '/settings'} /></Link>
+                    <SidebarItem icon={LayoutDashboard} label="Dashboard" active={location.pathname === '/'} to="/" />
+                    <SidebarItem icon={TrendingUp} label="Market" active={location.pathname === '/market'} to="/market" />
+                    <SidebarItem icon={PieChart} label="Portfolio" active={location.pathname === '/portfolio'} to="/portfolio" />
+                    <SidebarItem icon={FileText} label="History" active={location.pathname === '/history'} to="/history" />
+                    <SidebarItem icon={Settings} label="Settings" active={location.pathname === '/settings'} to="/settings" />
                 </nav>
 
                 <div className="pt-6 border-t border-slate-800">
