@@ -53,12 +53,14 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-const strategyRoutes = require('./routes/strategies');
+// TODO: Fix strategy routes - temporarily disabled for deployment
+// const strategyRoutes = require('./routes/strategies');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/strategies', strategyRoutes);
+// app.use('/api/strategies', strategyRoutes); // Temporarily disabled
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
