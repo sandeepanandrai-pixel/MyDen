@@ -3,6 +3,7 @@ import MarketChart from '../components/MarketChart';
 import AssetCard from '../components/AssetCard';
 import NewsFeed from '../components/NewsFeed';
 import TransactionModal from '../components/TransactionModal';
+import StrategyRecommendation from '../components/StrategyRecommendation';
 import { Plus } from 'lucide-react';
 import api from '../utils/api';
 import { getMarketData } from '../services/marketData';
@@ -139,6 +140,9 @@ const Dashboard = () => {
                     </div>
 
                     <NewsFeed />
+
+                    {/* AI Strategy Recommendation */}
+                    <StrategyRecommendation />
                 </div>
 
                 {/* Right Column (Watchlist/Assets) */}

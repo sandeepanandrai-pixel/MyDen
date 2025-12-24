@@ -53,9 +53,12 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
+const strategyRoutes = require('./routes/strategies');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/strategies', strategyRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

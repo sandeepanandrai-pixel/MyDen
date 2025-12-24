@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, Search, Bell, FileText } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, Search, Bell, FileText, BarChart } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -37,6 +37,7 @@ const Layout = ({ children }) => {
                     <SidebarItem icon={LayoutDashboard} label="Dashboard" active={location.pathname === '/'} to="/" />
                     <SidebarItem icon={TrendingUp} label="Market" active={location.pathname === '/market'} to="/market" />
                     <SidebarItem icon={PieChart} label="Portfolio" active={location.pathname === '/portfolio'} to="/portfolio" />
+                    <SidebarItem icon={BarChart} label="Analysis" active={location.pathname === '/analysis'} to="/analysis" />
                     <SidebarItem icon={FileText} label="History" active={location.pathname === '/history'} to="/history" />
                     <SidebarItem icon={Settings} label="Settings" active={location.pathname === '/settings'} to="/settings" />
                 </nav>

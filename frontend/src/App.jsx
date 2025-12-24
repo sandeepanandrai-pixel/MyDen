@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Market from './pages/Market';
 import Portfolio from './pages/Portfolio';
+import PortfolioAnalysis from './pages/PortfolioAnalysis';
 import History from './pages/History';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -31,6 +32,7 @@ const AppContent = () => {
         <PrivateRoute exact path="/" component={Dashboard} />
         <PrivateRoute exact path="/market" component={Market} />
         <PrivateRoute exact path="/portfolio" component={Portfolio} />
+        <PrivateRoute exact path="/analysis" component={PortfolioAnalysis} />
         <PrivateRoute exact path="/history" component={History} />
         <PrivateRoute exact path="/settings" component={Settings} />
       </Switch>
