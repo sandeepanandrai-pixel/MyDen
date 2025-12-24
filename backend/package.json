@@ -13,10 +13,11 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-rate-limit": "^8.2.1",
-    "express-validator": "^7.3.1",
+    "express-validator": "^7.0.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^5.10.9"
+    "mongoose": "^5.10.9",
+    "nodemailer": "^6.9.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

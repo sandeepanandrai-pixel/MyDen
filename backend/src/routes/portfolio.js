@@ -3,7 +3,7 @@ const router = express.Router();
 const Portfolio = require('../models/Portfolio');
 const Transaction = require('../models/Transaction');
 const { protect } = require('../middleware/authMiddleware');
-const { transactionValidation } = require('../middleware/validation');
+const { transactionValidation } = require('../middleware/enhancedValidation');
 const { transactionLimiter } = require('../middleware/rateLimiter');
 
 // Get current portfolio
@@ -26,12 +26,23 @@ router.get('/history', protect, async (req, res) => {
     }
 });
 
-// Execute transaction (Buy/Sell)
+// Execute transaction (Buy/Sell) with enhanced validation
 router.post('/transaction', protect, transactionLimiter, transactionValidation, async (req, res) => {
     const { type, symbol, quantity, price } = req.body;
     const total = quantity * price;
 
     try {
+        // For sell transactions, check if user has sufficient holdings
+        if (type === 'sell') {
+            const asset = await Portfolio.findOne({ user: req.user._id, symbol });
+            if (!asset || asset.quantity < quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient ${symbol} holdings. You have ${asset ? asset.quantity : 0}, trying to sell ${quantity}`
+                });
+            }
+        }
+
         // Record the transaction
         const transaction = new Transaction({
             user: req.user._id,
@@ -65,22 +76,30 @@ router.post('/transaction', protect, transactionLimiter, transactionValidation, 
             }
             await asset.save();
         } else if (type === 'sell') {
-            if (!asset || asset.quantity < quantity) {
-                return res.status(400).json({ message: 'Insufficient holdings' });
-            }
             asset.quantity -= quantity;
+            const soldValue = quantity * asset.averageBuyPrice;
+            asset.totalInvested -= soldValue;
+
             if (asset.quantity === 0) {
-                asset.totalInvested = 0;
-                // We could remove the doc, but keeping it with 0 qty is fine too.
-                // For cleanliness, let's remove if 0 to clean up DB? 
-                // Actually keeping it is better to avoid "not found" logic errors later.
+                // Remove asset if quantity is 0
+                await Portfolio.findByIdAndDelete(asset._id);
+                asset = null;
+            } else {
+                await asset.save();
             }
-            await asset.save();
         }
 
-        res.status(201).json({ transaction, portfolio: asset });
+        res.status(201).json({
+            success: true,
+            message: `Successfully ${type === 'buy' ? 'purchased' : 'sold'} ${quantity} ${symbol}`,
+            transaction,
+            portfolio: asset
+        });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
