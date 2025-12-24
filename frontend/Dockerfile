@@ -1,35 +1,45 @@
-# Build stage
-FROM node:16 as build
+# Stage 1: Build the React app
+FROM node:18-bullseye as builder
 
+# Set working directory
 WORKDIR /app
+
+# Set npm configs
+RUN npm config set fetch-retry-maxtimeout 600000 && \
+    npm config set fetch-retry-mintimeout 100000
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with no optional packages and fix permissions
-RUN npm install --legacy-peer-deps --no-optional && \
-    npm cache clean --force
+# Install dependencies
+RUN npm install --legacy-peer-deps --verbose
 
-# Copy source files
+# Copy all source files
 COPY . .
 
-# Set NODE_OPTIONS for build
-ENV NODE_OPTIONS=--max_old_space_size=4096
-
-# Build the application
+# Build the app
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+# Stage 2: Serve with nginx
+FROM nginx:stable-alpine
 
-# Copy built assets from build stage
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy build files
+COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy nginx configuration if exists, otherwise use default
-COPY nginx.conf /etc/nginx/conf.d/default.conf 2>/dev/null || echo "Using default nginx config"
+# Create nginx config
+RUN echo 'server { \
+    listen 80; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+    error_page 500 502 503 504 /50x.html; \
+    location = /50x.html { \
+        root /usr/share/nginx/html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
-# Expose port 80
 EXPOSE 80
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
