@@ -1,42 +1,36 @@
-# Stage 1: Build the React app
+# Stage 1: Build
 FROM node:18-bullseye as builder
 
-# Set working directory
 WORKDIR /app
-
-# Set npm configs
-RUN npm config set fetch-retry-maxtimeout 600000 && \
-    npm config set fetch-retry-mintimeout 100000
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --legacy-peer-deps --verbose
+# Install ALL dependencies (including devDependencies for build)
+RUN npm install --legacy-peer-deps && \
+    chmod -R 777 node_modules
 
-# Copy all source files
+# Copy source code
 COPY . .
 
-# Build the app
-RUN npm run build
+# Build using full path to react-scripts
+RUN ./node_modules/.bin/react-scripts build || \
+    $(npm bin)/react-scripts build || \
+    npx --yes react-scripts build
 
-# Stage 2: Serve with nginx
+# Stage 2: Production
 FROM nginx:stable-alpine
 
-# Copy build files
+# Copy built files
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Create nginx config
+# Nginx config
 RUN echo 'server { \
     listen 80; \
     location / { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \
         try_files $uri $uri/ /index.html; \
-    } \
-    error_page 500 502 503 504 /50x.html; \
-    location = /50x.html { \
-        root /usr/share/nginx/html; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
