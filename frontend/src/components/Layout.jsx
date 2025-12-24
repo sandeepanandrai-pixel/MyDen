@@ -1,47 +1,127 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, Search, Bell, FileText, BarChart } from 'lucide-react';
-
+import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, FileText, BarChart, Menu, X, Search, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import NotificationCenter from './NotificationCenter';
 
-const SidebarItem = ({ icon: Icon, label, active, onClick, to }) => {
+const SidebarItem = ({ icon: Icon, label, active, onClick, to, isMobile, closeSidebar }) => {
+    const handleClick = () => {
+        if (isMobile && closeSidebar) {
+            closeSidebar();
+        }
+        if (onClick) onClick();
+    };
+
     const content = (
-        <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+        <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 ${active ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
             <Icon size={20} />
             <span className="font-medium">{label}</span>
         </div>
     );
 
-    // If 'to' is provided, render as Link; otherwise use div with onClick
     if (to) {
-        return <Link to={to} className="block">{content}</Link>;
+        return <Link to={to} className="block" onClick={handleClick}>{content}</Link>;
     }
 
-    return <div onClick={onClick}>{content}</div>;
+    return <div onClick={handleClick}>{content}</div>;
 };
 
 const Layout = ({ children }) => {
     const { logout } = useAuth();
     const location = useLocation();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const closeSidebar = () => setSidebarOpen(false);
 
     return (
-        <div className="flex h-screen bg-slate-900 text-white overflow-hidden">
+        <div className="flex h-screen bg-gradient-to-br from-[#0a0e27] via-[#10162f] to-[#0a0e27] text-white overflow-hidden">
+            {/* Mobile Overlay */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+                    onClick={closeSidebar}
+                ></div>
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 bg-slate-950 p-6 flex flex-col border-r border-slate-800">
+            <aside className={`
+                fixed lg:static inset-y-0 left-0 z-50
+                w-64 bg-slate-950/90 backdrop-blur-xl p-6 
+                flex flex-col border-r border-slate-800
+                transform transition-transform duration-300 ease-in-out
+                ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}>
+                {/* Close button (mobile only) */}
+                <button
+                    onClick={closeSidebar}
+                    className="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-white"
+                >
+                    <X size={24} />
+                </button>
+
+                {/* Logo */}
                 <div className="flex items-center space-x-2 mb-10 px-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">I</div>
-                    <span className="text-xl font-bold tracking-tight">Invest<span className="text-blue-500">App</span></span>
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">
+                        I
+                    </div>
+                    <span className="text-xl font-bold tracking-tight">
+                        Invest<span className="gradient-text">App</span>
+                    </span>
                 </div>
 
+                {/* Navigation */}
                 <nav className="flex-1 space-y-2">
-                    <SidebarItem icon={LayoutDashboard} label="Dashboard" active={location.pathname === '/'} to="/" />
-                    <SidebarItem icon={TrendingUp} label="Market" active={location.pathname === '/market'} to="/market" />
-                    <SidebarItem icon={PieChart} label="Portfolio" active={location.pathname === '/portfolio'} to="/portfolio" />
-                    <SidebarItem icon={BarChart} label="Analysis" active={location.pathname === '/analysis'} to="/analysis" />
-                    <SidebarItem icon={FileText} label="History" active={location.pathname === '/history'} to="/history" />
-                    <SidebarItem icon={Settings} label="Settings" active={location.pathname === '/settings'} to="/settings" />
+                    <SidebarItem
+                        icon={LayoutDashboard}
+                        label="Dashboard"
+                        active={location.pathname === '/'}
+                        to="/"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
+                        icon={TrendingUp}
+                        label="Market"
+                        active={location.pathname === '/market'}
+                        to="/market"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
+                        icon={PieChart}
+                        label="Portfolio"
+                        active={location.pathname === '/portfolio'}
+                        to="/portfolio"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
+                        icon={BarChart}
+                        label="Analysis"
+                        active={location.pathname === '/analysis'}
+                        to="/analysis"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
+                        icon={FileText}
+                        label="History"
+                        active={location.pathname === '/history'}
+                        to="/history"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
+                        icon={Settings}
+                        label="Settings"
+                        active={location.pathname === '/settings'}
+                        to="/settings"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
                 </nav>
 
+                {/* Logout */}
                 <div className="pt-6 border-t border-slate-800">
                     <SidebarItem icon={LogOut} label="Logout" onClick={logout} />
                 </div>
@@ -50,31 +130,88 @@ const Layout = ({ children }) => {
             {/* Main Content */}
             <main className="flex-1 flex flex-col overflow-hidden">
                 {/* Header */}
-                <header className="h-16 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-900/50 backdrop-blur-md">
-                    <div className="relative w-96">
+                <header className="h-16 border-b border-slate-800 flex items-center justify-between px-4 lg:px-8 bg-slate-900/50 backdrop-blur-md shrink-0">
+                    {/* Mobile Menu Button */}
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    >
+                        <Menu size={24} />
+                    </button>
+
+                    {/* Search (hidden on small mobile) */}
+                    <div className="hidden sm:block relative flex-1 max-w-md lg:max-w-lg">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" size={18} />
                         <input
                             type="text"
-                            placeholder="Search stocks, ETFs, crypto..."
+                            placeholder="Search..."
                             className="w-full bg-slate-800 text-sm text-white pl-10 pr-4 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-slate-500 transition-all"
                         />
                     </div>
 
-                    <div className="flex items-center space-x-4">
-                        <button className="relative p-2 text-slate-400 hover:text-white transition-colors">
-                            <Bell size={20} />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-900"></span>
+                    {/* Right side icons */}
+                    <div className="flex items-center space-x-2 lg:space-x-4">
+                        {/* Search icon for mobile */}
+                        <button className="sm:hidden p-2 text-slate-400 hover:text-white">
+                            <Search size={20} />
                         </button>
-                        <div className="h-8 w-8 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full border border-slate-700"></div>
+
+                        <NotificationCenter />
+
+                        <div className="hidden lg:flex items-center space-x-2 px-3 py-2 bg-slate-800 rounded-lg">
+                            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
+                                U
+                            </div>
+                            <span className="text-sm font-medium">User</span>
+                        </div>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <div className="flex-1 overflow-auto p-8 bg-slate-900">
-                    <div className="max-w-7xl mx-auto">
-                        {children}
-                    </div>
+                <div className="flex-1 overflow-auto">
+                    {children}
                 </div>
+
+                {/* Bottom Navigation (Mobile Only) */}
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 z-30">
+                    <div className="flex justify-around items-center h-16 px-2">
+                        <Link
+                            to="/"
+                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/' ? 'text-blue-500' : 'text-slate-400'}`}
+                        >
+                            <LayoutDashboard size={20} />
+                            <span className="text-xs mt-1">Home</span>
+                        </Link>
+                        <Link
+                            to="/market"
+                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/market' ? 'text-blue-500' : 'text-slate-400'}`}
+                        >
+                            <TrendingUp size={20} />
+                            <span className="text-xs mt-1">Market</span>
+                        </Link>
+                        <Link
+                            to="/portfolio"
+                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/portfolio' ? 'text-blue-500' : 'text-slate-400'}`}
+                        >
+                            <PieChart size={20} />
+                            <span className="text-xs mt-1">Portfolio</span>
+                        </Link>
+                        <Link
+                            to="/analysis"
+                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/analysis' ? 'text-blue-500' : 'text-slate-400'}`}
+                        >
+                            <BarChart size={20} />
+                            <span className="text-xs mt-1">Analysis</span>
+                        </Link>
+                        <Link
+                            to="/settings"
+                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/settings' ? 'text-blue-500' : 'text-slate-400'}`}
+                        >
+                            <Settings size={20} />
+                            <span className="text-xs mt-1">Settings</span>
+                        </Link>
+                    </div>
+                </nav>
             </main>
         </div>
     );
