@@ -1,284 +1,285 @@
-# 🚀 QUICK DEPLOY GUIDE - Get Live in 1 Hour
+# 🚀 DEPLOY NOW - Your Specific Configuration
 
-## Step 1: Fix Docker Build (15 minutes)
-
-### Create docker-compose.yml for easy deployment
-
-```yaml
-version: '3.8'
-
-services:
-  backend:
-    image: 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-backend:latest
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-      - PORT=5000
-      - MONGO_URI=${MONGO_URI}
-      - JWT_SECRET=${JWT_SECRET}
-      - FRONTEND_URL=http://YOUR_EC2_IP:3000
-    restart: unless-stopped
-
-  frontend:
-    image: 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-frontend:latest
-    ports:
-      - "80:80"
-    environment:
-      - REACT_APP_API_URL=http://YOUR_EC2_IP:5000
-    restart: unless-stopped
-    depends_on:
-      - backend
+## ✅ Your MongoDB is Ready!
+Connection String: 
+```
+mongodb+srv://sandeepanandrai_db_user:H40NJgy378ohlNuH@myden.yzrreio.mongodb.net/myden?retryWrites=true&w=majority
 ```
 
-## Step 2: Setup MongoDB Atlas (10 minutes)
+---
 
-1. Go to: https://www.mongodb.com/cloud/atlas/register
-2. Create FREE account
-3. Click "Build a Database" → Choose FREE tier (M0)
-4. Choose AWS as provider, us-east-2 region
-5. Click "Create"
-6. Create database user:
-   - Username: `mydenuser`
-   - Password: (generate strong password - save it!)
-7. Add IP: Click "Network Access" → "Add IP Address" → "Allow Access from Anywhere" (0.0.0.0/0)
-8. Get connection string:
-   - Click "Connect" → "Connect your application"
-   - Copy the connection string
-   - Format: `mongodb+srv://mydenuser:<password>@cluster0.xxxxx.mongodb.net/myden?retryWrites=true&w=majority`
+## NEXT STEPS:
 
-## Step 3: Launch EC2 Instance (10 minutes)
+### Step 1: Launch EC2 Instance (10 minutes)
 
-### Using AWS Console:
-
-1. **Go to EC2**: https://console.aws.amazon.com/ec2/
+1. **Go to EC2 Console**: https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#Instances:
 2. **Click "Launch Instance"**
 3. **Configure**:
-   - Name: `MyDen-App`
-   - AMI: **Amazon Linux 2023** (or Ubuntu 22.04)
-   - Instance type: **t3.medium** (2 vCPU, 4GB RAM - free tier eligible for 1 month)
-   - Key pair: Create new or use existing (SAVE THE .pem FILE!)
-   - Network: Allow SSH (22), HTTP (80), Custom TCP (5000)
-   - Storage: 20 GB gp3
+   ```
+   Name: MyDen-App
+   AMI: Amazon Linux 2023 AMI
+   Instance type: t3.medium (or t3.micro for lower cost)
+   Key pair: Create new → Name it "myden-key" → Download myden-key.pem
+   
+   Network Settings → Edit:
+   - Create security group: myden-app-sg
+   - Add rules:
+     * SSH (22) - My IP
+     * HTTP (80) - Anywhere (0.0.0.0/0)
+     * Custom TCP (5000) - Anywhere (0.0.0.0/0)
+   
+   Storage: 20 GB gp3
+   ```
 4. **Click "Launch Instance"**
-5. **Wait 2 minutes** for it to start
-6. **Copy Public IP address**
+5. **Wait 2 minutes**, then copy the **Public IPv4 address**
 
-### Security Group Rules:
-```
-SSH (22) - Your IP
-HTTP (80) - 0.0.0.0/0
-Custom TCP (5000) - 0.0.0.0/0
-HTTPS (443) - 0.0.0.0/0 (for later)
-```
+---
 
-## Step 4: Connect to EC2 & Setup (15 minutes)
+### Step 2: Connect to Your EC2 (5 minutes)
 
-### SSH into your instance:
-
-#### Windows (PowerShell):
+#### On Windows PowerShell:
 ```powershell
-# Fix permissions on .pem file (one time)
-icacls "path\to\your-key.pem" /inheritance:r
-icacls "path\to\your-key.pem" /grant:r "$($env:USERNAME):(R)"
+# Navigate to where you downloaded the .pem file
+cd Downloads
 
-# Connect
-ssh -i "path\to\your-key.pem" ec2-user@YOUR_EC2_PUBLIC_IP
+# Fix permissions
+icacls "myden-key.pem" /inheritance:r
+icacls "myden-key.pem" /grant:r "$($env:USERNAME):(R)"
+
+# Connect (replace YOUR_EC2_IP with actual IP)
+ssh -i myden-key.pem ec2-user@YOUR_EC2_IP
 ```
 
-#### Mac/Linux:
-```bash
-chmod 400 your-key.pem
-ssh -i your-key.pem ec2-user@YOUR_EC2_PUBLIC_IP
-```
+---
 
-### Once connected, run these commands:
+### Step 3: Setup Server (10 minutes)
+
+Once connected to EC2, run these commands:
 
 ```bash
 # Update system
 sudo yum update -y
 
-# Install Docker
-sudo yum install docker -y
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo usermod -a -G docker ec2-user
+# Install Node.js 18
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
 
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+# Install Git
+sudo yum install -y git
 
-# Verify
-docker --version
-docker-compose --version
+# Install PM2 (process manager)
+sudo npm install -g pm2
 
-# Log out and back in for group changes to take effect
-exit
+# Verify installations
+node --version  # Should show v18.x
+npm --version
+pm2 --version
+
+# Install nginx for frontend
+sudo yum install nginx -y
+sudo systemctl start nginx
+sudo systemctl enable nginx
 ```
 
-### SSH back in:
-```bash
-ssh -i your-key.pem ec2-user@YOUR_EC2_PUBLIC_IP
-```
+---
 
-## Step 5: Deploy Your App (10 minutes)
-
-### Configure AWS CLI and login to ECR:
+### Step 4: Deploy Backend (10 minutes)
 
 ```bash
-# Login to ECR
-aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 921963185108.dkr.ecr.us-east-2.amazonaws.com
+# Create app directory
+mkdir -p ~/myden-app
+cd ~/myden-app
+
+# Clone your code from GitHub
+git clone https://github.com/sandeepanandrai-pixel/MyDen.git .
+
+# Or upload via SCP if you prefer
+# (On your local machine):
+# scp -i myden-key.pem -r ./my-fullstack-app ec2-user@YOUR_EC2_IP:~/myden-app
+
+# Install backend dependencies
+cd backend
+npm install --production
+
+# Create .env file
+cat > .env << 'EOF'
+NODE_ENV=production
+PORT=5000
+MONGO_URI=mongodb+srv://sandeepanandrai_db_user:H40NJgy378ohlNuH@myden.yzrreio.mongodb.net/myden?retryWrites=true&w=majority
+JWT_SECRET=myden-super-secret-jwt-key-change-this-in-production-2024
+FRONTEND_URL=http://YOUR_EC2_IP
+EOF
+
+# Replace YOUR_EC2_IP with actual IP
+nano .env
+# Update FRONTEND_URL with your EC2 public IP, then Ctrl+X, Y, Enter
+
+# Start backend with PM2
+pm2 start src/app.js --name myden-backend
+pm2 save
+pm2 startup  # Follow the command it shows
 ```
 
-### Create docker-compose.yml:
+---
+
+### Step 5: Deploy Frontend (15 minutes)
 
 ```bash
-# Create project directory
-mkdir ~/myden-app && cd ~/myden-app
+# Go to frontend directory
+cd ~/myden-app/frontend
 
-# Create docker-compose.yml
-nano docker-compose.yml
+# Create .env file
+cat > .env << 'EOF'
+REACT_APP_API_URL=http://YOUR_EC2_IP:5000
+EOF
+
+# Update with your EC2 IP
+nano .env
+# Replace YOUR_EC2_IP, then Ctrl+X, Y, Enter
+
+# Install dependencies
+npm install
+
+# Build the app
+npm run build
+
+# Copy build to nginx directory
+sudo rm -rf /usr/share/nginx/html/*
+sudo cp -r build/* /usr/share/nginx/html/
+
+# Configure nginx
+sudo tee /etc/nginx/conf.d/myden.conf > /dev/null <<'EOF'
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+EOF
+
+# Restart nginx
+sudo systemctl restart nginx
+
+# Remove default config
+sudo rm /etc/nginx/conf.d/default.conf 2>/dev/null || true
+sudo systemctl restart nginx
 ```
 
-**Paste this (update YOUR_EC2_IP and MONGO_URI):**
+---
 
-```yaml
-version: '3.8'
+### Step 6: Access Your Live App! 🎉
 
-services:
-  backend:
-    image: 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-backend:latest
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-      - PORT=5000
-      - MONGO_URI=mongodb+srv://mydenuser:YOUR_PASSWORD@cluster0.xxxxx.mongodb.net/myden?retryWrites=true&w=majority
-      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-123456789
-      - FRONTEND_URL=http://YOUR_EC2_IP
-    restart: unless-stopped
-
-  frontend:
-    image: 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-frontend:latest
-    ports:
-      - "80:80"
-    restart: unless-stopped
-    depends_on:
-      - backend
+**Open your browser and go to:**
+```
+http://YOUR_EC2_IP
 ```
 
-**Save**: Ctrl+X, Y, Enter
-
-### Pull images and start:
-
-```bash
-# Pull images from ECR
-docker-compose pull
-
-# Start services
-docker-compose up -d
-
-# Check status
-docker-compose ps
-
-# View logs
-docker-compose logs -f
-```
-
-## Step 6: Access Your Live App! (2 minutes)
-
-**Open browser and go to:**
-```
-http://YOUR_EC2_PUBLIC_IP
-```
-
-You should see your app running! 🎉
+You should see your app running live!
 
 ---
 
 ## 🐛 Troubleshooting
 
-### If app doesn't load:
-
+### Check backend status:
 ```bash
-# Check if containers are running
-docker ps
-
-# Check backend logs
-docker-compose logs backend
-
-# Check frontend logs
-docker-compose logs frontend
-
-# Restart everything
-docker-compose down
-docker-compose up -d
+pm2 status
+pm2 logs myden-backend
 ```
 
-### If MongoDB connection fails:
-
-1. Check connection string format
-2. Verify MongoDB Atlas IP whitelist (0.0.0.0/0)
-3. Check username/password
-
-### If images don't exist in ECR:
-
-**You need to build and push first:**
-
+### Check frontend:
 ```bash
-# On your local machine or use CodeBuild
-cd backend
-docker build -t 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-backend:latest .
-docker push 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-backend:latest
+sudo systemctl status nginx
+sudo nginx -t  # Test config
+sudo tail -f /var/log/nginx/error.log
+```
 
-cd ../frontend
-docker build -t 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-frontend:latest .
-docker push 921963185108.dkr.ecr.us-east-2.amazonaws.com/myden-frontend:latest
+### Restart services:
+```bash
+pm2 restart myden-backend
+sudo systemctl restart nginx
+```
+
+### Check MongoDB connection:
+```bash
+cd ~/myden-app/backend
+node
+> const mongoose = require('mongoose');
+> mongoose.connect('YOUR_MONGO_URI');
+> .exit
 ```
 
 ---
 
-## ✅ You're Live!
+## 🔒 Important Security Notes
 
-Your app is now running at: `http://YOUR_EC2_IP`
+**After your app is working**, do these:
 
-### Next Steps (Optional):
+1. **Change JWT Secret**:
+   ```bash
+   cd ~/myden-app/backend
+   nano .env
+   # Change JWT_SECRET to a long random string
+   pm2 restart myden-backend
+   ```
 
-1. **Get a domain** (GoDaddy, Namecheap, Route 53)
-2. **Setup HTTPS** (Let's Encrypt + nginx)
-3. **Add auto-restart** (systemd service)
-4. **Setup backups** (MongoDB snapshots)
-5. **Add monitoring** (CloudWatch)
+2. **Restrict SSH**:
+   - Go to EC2 console → Security Groups
+   - Edit SSH rule to only allow your IP
 
----
-
-## 🎯 Quick Reference
-
-**Start app**: `docker-compose up -d`
-**Stop app**: `docker-compose down`
-**View logs**: `docker-compose logs -f`
-**Restart**: `docker-compose restart`
-**Update**: `docker-compose pull && docker-compose up -d`
-
-**EC2 IP**: Save this somewhere!
-**MongoDB URI**: Keep this secret!
-**JWT Secret**: Change before production!
+3. **Setup HTTPS** (later):
+   - Get a domain name
+   - Use Let's Encrypt for free SSL
 
 ---
 
-## 💰 Cost Estimate
+## 💰 Cost
 
-**Monthly cost (if you keep running):**
-- EC2 t3.medium: ~$30/month (or FREE for 750 hours/month first year)
-- MongoDB Atlas M0: FREE forever
+**Running costs:**
+- t3.medium: ~$0.042/hour (~$30/month)
+- t3.micro: ~$0.010/hour (~$7/month) - cheaper but slower
+- MongoDB Atlas M0: FREE
 - Data transfer: ~$5/month
-- **Total**: ~$35/month (or FREE with AWS free tier)
 
-**To minimize costs:**
-- Stop EC2 when not using
-- Use t3.micro instead ($7/month)
-- Set up auto-shutdown at night
+**To save money:**
+- Stop EC2 when not in use
+- Use t3.micro instead
+- Setup auto-shutdown schedule
+
+---
+
+## 📝 Quick Commands
+
+**Start backend**: `pm2 start myden-backend`
+**Stop backend**: `pm2 stop myden-backend`
+**Restart backend**: `pm2 restart myden-backend`
+**View backend logs**: `pm2 logs myden-backend`
+
+**Restart nginx**: `sudo systemctl restart nginx`
+**Check nginx**: `sudo systemctl status nginx`
+
+**Update app**:
+```bash
+cd ~/myden-app
+git pull
+cd backend && npm install && pm2 restart myden-backend
+cd ../frontend && npm install && npm run build && sudo cp -r build/* /usr/share/nginx/html/
+```
 
 ---
 
 **YOU'RE LIVE! 🚀**
+
+**Your app URL**: `http://YOUR_EC2_IP`
