@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, FileText, BarChart, Menu, X, Search, Bell } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, FileText, BarChart, Menu, X, Search, Bell, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NotificationCenter from './NotificationCenter';
+import AIChatAssistant from './AIChatAssistant';
 
 const SidebarItem = ({ icon: Icon, label, active, onClick, to, isMobile, closeSidebar }) => {
     const handleClick = () => {
@@ -27,9 +28,10 @@ const SidebarItem = ({ icon: Icon, label, active, onClick, to, isMobile, closeSi
 };
 
 const Layout = ({ children }) => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [chatMinimized, setChatMinimized] = useState(true);
 
     const closeSidebar = () => setSidebarOpen(false);
 
@@ -224,6 +226,12 @@ const Layout = ({ children }) => {
                     </div>
                 </nav>
             </main>
+
+            {/* AI Chat Assistant */}
+            <AIChatAssistant
+                minimized={chatMinimized}
+                onToggle={() => setChatMinimized(!chatMinimized)}
+            />
         </div>
     );
 };
