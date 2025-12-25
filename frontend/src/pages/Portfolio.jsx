@@ -62,7 +62,7 @@ const Portfolio = () => {
                             </div>
                             <div>
                                 <p className="text-slate-400 text-sm">Total Value</p>
-                                <p className="text-2xl font-bold text-white">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                <p className="text-2xl font-bold text-white">${(totalValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                             </div>
                         </div>
                     </div>
@@ -75,7 +75,7 @@ const Portfolio = () => {
                             <div>
                                 <p className="text-slate-400 text-sm">Total P/L</p>
                                 <p className={`text-2xl font-bold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                    {profit >= 0 ? '+' : ''}${profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {profit >= 0 ? '+' : ''}${(profit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </p>
                             </div>
                         </div>
