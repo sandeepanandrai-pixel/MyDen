@@ -26,7 +26,17 @@ const Settings = () => {
         setMessage({ type: '', text: '' });
 
         try {
-            const token = localStorage.getItem('token');
+            // Get token from user object in localStorage
+            const storedUser = localStorage.getItem('user');
+            const userData = storedUser ? JSON.parse(storedUser) : null;
+            const token = userData?.token;
+
+            if (!token) {
+                setMessage({ type: 'error', text: 'Please login again' });
+                setLoading(false);
+                return;
+            }
+
             const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
             const response = await axios.put(
@@ -136,8 +146,8 @@ const Settings = () => {
                     {/* Success/Error Message */}
                     {message.text && (
                         <div className={`p-4 rounded-lg flex items-center space-x-3 ${message.type === 'success'
-                                ? 'bg-green-900/20 border border-green-600/30 text-green-300'
-                                : 'bg-red-900/20 border border-red-600/30 text-red-300'
+                            ? 'bg-green-900/20 border border-green-600/30 text-green-300'
+                            : 'bg-red-900/20 border border-red-600/30 text-red-300'
                             }`}>
                             {message.type === 'success' ? <Check size={20} /> : <AlertCircle size={20} />}
                             <span>{message.text}</span>
