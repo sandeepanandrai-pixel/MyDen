@@ -11,6 +11,7 @@ import History from './pages/History';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 // Component wrapper to conditionally render Layout based on route
 const AppContent = () => {
@@ -35,6 +36,7 @@ const AppContent = () => {
         <PrivateRoute exact path="/analysis" component={PortfolioAnalysis} />
         <PrivateRoute exact path="/history" component={History} />
         <PrivateRoute exact path="/settings" component={Settings} />
+        <PrivateRoute exact path="/profile" component={Profile} />
       </Switch>
     </Layout>
   );

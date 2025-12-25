@@ -115,6 +115,14 @@ const Layout = ({ children }) => {
                         closeSidebar={closeSidebar}
                     />
                     <SidebarItem
+                        icon={User}
+                        label="Profile"
+                        active={location.pathname === '/profile'}
+                        to="/profile"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
                         icon={Settings}
                         label="Settings"
                         active={location.pathname === '/settings'}
