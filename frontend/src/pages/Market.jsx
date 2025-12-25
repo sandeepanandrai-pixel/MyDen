@@ -122,17 +122,17 @@ const Market = () => {
                             <div className="space-y-3">
                                 <div>
                                     <p className="text-slate-400 text-xs mb-1">Current Price</p>
-                                    <p className="text-2xl font-bold text-white">${coin.current_price.toLocaleString()}</p>
+                                    <p className="text-2xl font-bold text-white">${coin.current_price?.toLocaleString() || '0'}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="glass rounded-lg p-2">
                                         <p className="text-slate-400 text-xs">Market Cap</p>
-                                        <p className="text-white font-semibold text-sm">${(coin.market_cap / 1e9).toFixed(2)}B</p>
+                                        <p className="text-white font-semibold text-sm">${coin.market_cap ? (coin.market_cap / 1e9).toFixed(2) : '0'}B</p>
                                     </div>
                                     <div className="glass rounded-lg p-2">
                                         <p className="text-slate-400 text-xs">Volume</p>
-                                        <p className="text-white font-semibold text-sm">${(coin.total_volume / 1e9).toFixed(2)}B</p>
+                                        <p className="text-white font-semibold text-sm">${coin.total_volume ? (coin.total_volume / 1e9).toFixed(2) : '0'}B</p>
                                     </div>
                                 </div>
 
