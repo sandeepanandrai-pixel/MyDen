@@ -5,26 +5,10 @@
     "devCommand": "npm start",
     "installCommand": "npm install --legacy-peer-deps",
     "framework": "create-react-app",
-    "routes": [
+    "rewrites": [
         {
-            "src": "/static/(.*)",
-            "dest": "/static/$1"
-        },
-        {
-            "src": "/favicon.ico",
-            "dest": "/favicon.ico"
-        },
-        {
-            "src": "/manifest.json",
-            "dest": "/manifest.json"
-        },
-        {
-            "src": "/logo(.*)",
-            "dest": "/logo$1"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/index.html"
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ],
     "headers": [
