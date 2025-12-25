@@ -22,11 +22,35 @@ app.use('/api/', apiLimiter);
 
 // Middleware
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production'
-        ? process.env.FRONTEND_URL || 'https://yourdomain.com'
-        : ['http://localhost:3000', 'http://localhost:3001'],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, etc)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'https://my-den-beta.vercel.app',
+            /\.vercel\.app$/, // All Vercel preview deployments
+            process.env.FRONTEND_URL
+        ].filter(Boolean);
+
+        const isAllowed = allowedOrigins.some(allowed => {
+            if (allowed instanceof RegExp) {
+                return allowed.test(origin);
+            }
+            return allowed === origin;
+        });
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
