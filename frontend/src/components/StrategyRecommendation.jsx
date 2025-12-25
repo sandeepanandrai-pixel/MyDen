@@ -16,14 +16,18 @@ const StrategyRecommendation = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
+            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
             const response = await axios.get(
-                `http://localhost:5000/api/strategies/recommend?riskTolerance=${riskTolerance}`,
+                `${apiUrl}/api/strategies/recommend?riskTolerance=${riskTolerance}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setRecommendation(response.data);
             setMarketData(response.data.marketCondition);
         } catch (error) {
             console.error('Failed to fetch recommendation:', error);
+            // Set default data if API is unavailable
+            setMarketData(null);
+            setRecommendation(null);
         } finally {
             setLoading(false);
         }
@@ -122,8 +126,8 @@ const StrategyRecommendation = () => {
                             key={risk}
                             onClick={() => setRiskTolerance(risk)}
                             className={`py-2 px-4 rounded-lg font-semibold transition-all ${riskTolerance === risk
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                                 }`}
                         >
                             {risk === 'conservative' && <Shield size={16} className="inline mr-1" />}
