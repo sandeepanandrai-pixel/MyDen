@@ -60,13 +60,16 @@ const Layout = ({ children }) => {
                 </button>
 
                 {/* Logo */}
-                <div className="flex items-center space-x-2 mb-10 px-2">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center font-bold text-xl shadow-lg">
-                        I
+                <div className="flex items-center space-x-3 mb-10 px-2">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-purple-500/30 transform hover:scale-105 transition-transform">
+                        <span className="text-2xl">🏠</span>
                     </div>
-                    <span className="text-xl font-bold tracking-tight">
-                        Invest<span className="gradient-text">App</span>
-                    </span>
+                    <div className="flex flex-col">
+                        <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-purple-400 via-purple-300 to-blue-400 bg-clip-text text-transparent">
+                            MyDen
+                        </span>
+                        <span className="text-xs text-slate-500 font-medium">Your Investment Den</span>
+                    </div>
                 </div>
 
                 {/* Navigation */}
