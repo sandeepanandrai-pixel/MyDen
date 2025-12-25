@@ -17,8 +17,9 @@ const PortfolioAnalysis = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
+            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
             const response = await axios.post(
-                'http://localhost:5000/api/strategies/analyze',
+                `${apiUrl}/api/strategies/analyze`,
                 { riskTolerance },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -27,7 +28,7 @@ const PortfolioAnalysis = () => {
             // Also fetch rebalancing suggestions
             if (response.data.needsRebalancing) {
                 const rebalanceResponse = await axios.post(
-                    'http://localhost:5000/api/strategies/rebalance',
+                    `${apiUrl}/api/strategies/rebalance`,
                     { riskTolerance },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -35,6 +36,8 @@ const PortfolioAnalysis = () => {
             }
         } catch (error) {
             console.error('Failed to fetch analysis:', error);
+            // Show coming soon message if API is not available
+            setAnalysis({ isEmpty: true, isComingSoon: true });
         } finally {
             setLoading(false);
         }
@@ -79,17 +82,21 @@ const PortfolioAnalysis = () => {
 
     if (analysis?.isEmpty) {
         return (
-            <div className="min-h-screen bg-slate-900 p-6">
+            <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#10162f] to-[#0a0e27] p-6">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-slate-800 rounded-xl p-12 text-center border border-slate-700">
-                        <PieChart size={64} className="mx-auto text-slate-600 mb-4" />
-                        <h2 className="text-2xl font-bold text-white mb-2">No Portfolio Yet</h2>
-                        <p className="text-slate-400 mb-6">
-                            Start investing to get AI-powered portfolio analysis and recommendations.
+                    <div className="premium-card p-12 text-center">
+                        <PieChart size={64} className="mx-auto text-purple-400 mb-4" />
+                        <h2 className="text-3xl font-bold gradient-text mb-2">
+                            {analysis.isComingSoon ? '🚀 AI Analysis Coming Soon!' : 'No Portfolio Yet'}
+                        </h2>
+                        <p className="text-slate-300 mb-6 text-lg">
+                            {analysis.isComingSoon
+                                ? 'Advanced AI-powered portfolio analysis features are being deployed. Check back soon!'
+                                : 'Start investing to get AI-powered portfolio analysis and recommendations.'}
                         </p>
                         <a
                             href="/market"
-                            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                            className="btn-premium inline-block"
                         >
                             Explore Market
                         </a>
