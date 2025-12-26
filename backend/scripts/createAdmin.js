@@ -59,7 +59,7 @@ const createAdminUser = async () => {
             firstName,
             lastName,
             email,
-            phone: phone || '',
+            phone: phone || '+0000000000', // Default phone if empty (phone is required)
             password, // Will be hashed by the User model pre-save hook
             role: 'admin',
             isEmailVerified: true, // Auto-verify admin accounts
