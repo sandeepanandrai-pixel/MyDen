@@ -79,8 +79,8 @@ const Layout = ({ children }) => {
                     <SidebarItem
                         icon={LayoutDashboard}
                         label="Dashboard"
-                        active={location.pathname === '/'}
-                        to="/"
+                        active={location.pathname === '/dashboard'}
+                        to="/dashboard"
                         isMobile={true}
                         closeSidebar={closeSidebar}
                     />
@@ -189,11 +189,11 @@ const Layout = ({ children }) => {
                 <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800 z-30">
                     <div className="flex justify-around items-center h-16 px-2">
                         <Link
-                            to="/"
-                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/' ? 'text-blue-500' : 'text-slate-400'}`}
+                            to="/dashboard"
+                            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-lg transition-colors ${location.pathname === '/dashboard' ? 'text-blue-500' : 'text-slate-400'}`}
                         >
                             <LayoutDashboard size={20} />
-                            <span className="text-xs mt-1">Home</span>
+                            <span className="text-xs mt-1">Dashboard</span>
                         </Link>
                         <Link
                             to="/market"
