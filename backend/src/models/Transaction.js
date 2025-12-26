@@ -11,7 +11,21 @@ const TransactionSchema = new mongoose.Schema({
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
     total: { type: Number, required: true },
+
+    // Additional Transaction Details
+    fees: { type: Number, default: 0 },
+    notes: { type: String, default: '' },
+    source: {
+        type: String,
+        enum: ['manual', 'api', 'auto-rebalance', 'quick-trade'],
+        default: 'manual'
+    },
+
     date: { type: Date, default: Date.now }
 });
+
+// Indexes for performance
+TransactionSchema.index({ user: 1, date: -1 });
+TransactionSchema.index({ user: 1, symbol: 1 });
 
 module.exports = mongoose.model('Transaction', TransactionSchema);

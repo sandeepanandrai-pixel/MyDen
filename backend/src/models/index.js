@@ -1,22 +1,19 @@
-const mongoose = require('mongoose');
-
-const itemSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-const Item = mongoose.model('Item', itemSchema);
+const User = require('./User');
+const Portfolio = require('./Portfolio');
+const Transaction = require('./Transaction');
+const InvestmentStrategy = require('./InvestmentStrategy');
+const PriceAlert = require('./PriceAlert');
+const Notification = require('./Notification');
+const ChatMessage = require('./ChatMessage');
+const UserSettings = require('./UserSettings');
 
 module.exports = {
-    Item
+    User,
+    Portfolio,
+    Transaction,
+    InvestmentStrategy,
+    PriceAlert,
+    Notification,
+    ChatMessage,
+    UserSettings
 };
