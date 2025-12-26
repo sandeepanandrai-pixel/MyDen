@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Portfolio = require('../models/Portfolio');
 const Transaction = require('../models/Transaction');
+const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
 const { transactionValidation } = require('../middleware/enhancedValidation');
 const { transactionLimiter } = require('../middleware/rateLimiter');
+const { sendTransactionEmail } = require('../utils/emailService');
 
 // Get current portfolio
 router.get('/', protect, async (req, res) => {
@@ -50,7 +52,10 @@ router.post('/transaction', protect, transactionLimiter, transactionValidation, 
             symbol,
             quantity,
             price,
-            total
+            total,
+            fees: req.body.fees || 0,
+            notes: req.body.notes || '',
+            source: 'manual'
         });
         await transaction.save();
 
@@ -89,9 +94,24 @@ router.post('/transaction', protect, transactionLimiter, transactionValidation, 
             }
         }
 
+        // Send transaction confirmation email
+        try {
+            const user = await User.findById(req.user._id);
+            if (user && user.isEmailVerified && user.notifications.email) {
+                await sendTransactionEmail(
+                    user.email,
+                    user.firstName,
+                    transaction.toObject()
+                );
+            }
+        } catch (emailError) {
+            console.error('Failed to send transaction email:', emailError);
+            // Don't fail the transaction if email fails
+        }
+
         res.status(201).json({
             success: true,
-            message: `Successfully ${type === 'buy' ? 'purchased' : 'sold'} ${quantity} ${symbol}`,
+            message: `Successfully ${type === 'buy' ? 'purchased' : 'sold'} ${quantity} ${symbol}. Confirmation email sent!`,
             transaction,
             portfolio: asset
         });

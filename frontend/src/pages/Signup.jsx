@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useHistory, Link } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { ShieldCheck, User, Lock, Chrome, Phone, UserPlus } from 'lucide-react';
+import { ShieldCheck, User, Lock, Chrome, Phone, UserPlus, Mail, CheckCircle } from 'lucide-react';
 
 const Signup = () => {
-    const { signup, login } = useAuth();
+    const { signup } = useAuth();
     const history = useHistory();
     const [role, setRole] = useState('user');
     const [firstName, setFirstName] = useState('');
@@ -15,6 +15,7 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [captchaToken, setCaptchaToken] = useState(null);
     const [error, setError] = useState('');
+    const [showVerificationMessage, setShowVerificationMessage] = useState(false);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -29,7 +30,8 @@ const Signup = () => {
         const result = await signup({ firstName, lastName, email, phone, password, role });
 
         if (result.success) {
-            history.push('/');
+            // Show verification message instead of redirecting
+            setShowVerificationMessage(true);
         } else {
             setError(result.message);
         }
