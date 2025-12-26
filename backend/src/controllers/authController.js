@@ -28,6 +28,14 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // Security: Prevent admin signup through public registration
+        // Admin accounts must be created manually
+        if (role === 'admin') {
+            return res.status(403).json({
+                message: 'Admin accounts cannot be created through signup. Please contact support.'
+            });
+        }
+
         // Generate verification token
         const verificationToken = generateVerificationToken();
         const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
@@ -38,7 +46,7 @@ exports.registerUser = async (req, res) => {
             email,
             phone,
             password,
-            role,
+            role: 'user', // Force role to 'user' regardless of input
             isEmailVerified: false,
             emailVerificationToken: verificationToken,
             emailVerificationExpires: verificationExpires

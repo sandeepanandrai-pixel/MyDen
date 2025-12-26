@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useHistory, Link } from 'react-router-dom';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { ShieldCheck, User, Lock, Chrome, Phone, UserPlus, Mail, CheckCircle } from 'lucide-react';
+import { Lock, Chrome, Phone, UserPlus, Mail, CheckCircle } from 'lucide-react';
 
 const Signup = () => {
     const { signup } = useAuth();
     const history = useHistory();
-    const [role, setRole] = useState('user');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -26,8 +25,8 @@ const Signup = () => {
             return;
         }
 
-        // Real Signup Logic
-        const result = await signup({ firstName, lastName, email, phone, password, role });
+        // Real Signup Logic - role is always 'user'
+        const result = await signup({ firstName, lastName, email, phone, password, role: 'user' });
 
         if (result.success) {
             // Show verification message instead of redirecting
@@ -47,23 +46,6 @@ const Signup = () => {
                     </div>
                     <h1 className="text-3xl font-bold text-white">Create Account</h1>
                     <p className="text-slate-400 mt-2">Join InvestApp today</p>
-                </div>
-
-                <div className="flex bg-slate-700 p-1.5 rounded-xl mb-6">
-                    <button
-                        onClick={() => setRole('user')}
-                        className={`flex-1 flex items-center justify-center text-sm font-medium py-2 rounded-lg transition-all ${role === 'user' ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
-                    >
-                        <User size={16} className="mr-2" />
-                        User
-                    </button>
-                    <button
-                        onClick={() => setRole('admin')}
-                        className={`flex-1 flex items-center justify-center text-sm font-medium py-2 rounded-lg transition-all ${role === 'admin' ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
-                    >
-                        <ShieldCheck size={16} className="mr-2" />
-                        Admin
-                    </button>
                 </div>
 
                 <form onSubmit={handleSignup} className="space-y-4">
