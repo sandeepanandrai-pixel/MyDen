@@ -6,8 +6,8 @@ const createTransporter = () => {
     // For production, use services like SendGrid, AWS SES, or Mailgun
     return nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // use SSL
+        port: 587,
+        secure: false, // use TLS via STARTTLS
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASSWORD
@@ -15,7 +15,10 @@ const createTransporter = () => {
         // Connection settings
         connectionTimeout: 10000, // 10 seconds
         greetingTimeout: 5000,    // 5 seconds
-        socketTimeout: 10000      // 10 seconds
+        socketTimeout: 10000,     // 10 seconds
+        tls: {
+            rejectUnauthorized: false // Allow self-signed certificates if needed
+        }
     });
 };
 
