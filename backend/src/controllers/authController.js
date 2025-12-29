@@ -20,6 +20,11 @@ const generateVerificationToken = () => {
 // @access  Public
 exports.registerUser = async (req, res) => {
     const { firstName, lastName, email: rawEmail, phone, password, role } = req.body;
+
+    if (!rawEmail || !password) {
+        return res.status(400).json({ message: 'Please provide all required fields' });
+    }
+
     const email = rawEmail.toLowerCase().trim();
 
     try {
@@ -132,7 +137,13 @@ exports.verifyEmail = async (req, res) => {
 // @route   POST /api/auth/resend-verification
 // @access  Public
 exports.resendVerification = async (req, res) => {
-    const { email } = req.body;
+    const { email: rawEmail } = req.body;
+
+    if (!rawEmail) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const email = rawEmail.toLowerCase().trim();
 
     try {
         const user = await User.findOne({ email });
@@ -179,6 +190,11 @@ exports.resendVerification = async (req, res) => {
 // @access  Public
 exports.loginUser = async (req, res) => {
     const { email: rawEmail, password } = req.body;
+
+    if (!rawEmail || !password) {
+        return res.status(400).json({ message: 'Please provide email and password' });
+    }
+
     const email = rawEmail.toLowerCase().trim();
 
     try {
@@ -223,10 +239,16 @@ exports.loginUser = async (req, res) => {
 // @route   POST /api/auth/forgot-password
 // @access  Public
 exports.forgotPassword = async (req, res) => {
-    const { email } = req.body;
+    const { email: rawEmail } = req.body;
+
+    if (!rawEmail) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const email = rawEmail.toLowerCase().trim();
 
     try {
-        const user = await User.findOne({ email: email.toLowerCase().trim() });
+        const user = await User.findOne({ email });
 
         if (!user) {
             // For security, don't reveal if user exists
