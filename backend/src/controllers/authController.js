@@ -218,3 +218,73 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// @desc    Forgot Password - Send Reset Link
+// @route   POST /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+        if (!user) {
+            // For security, don't reveal if user exists
+            return res.json({ message: 'If a user with this email exists, a password reset link has been sent.' });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpires = resetExpires;
+        await user.save();
+
+        // Send reset email
+        // Require it here since it was added to exports
+        const { sendPasswordResetEmail } = require('../utils/emailService');
+        await sendPasswordResetEmail(user.email, user.firstName, resetToken);
+
+        res.json({ message: 'If a user with this email exists, a password reset link has been sent.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Reset Password
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+exports.resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired password reset token' });
+        }
+
+        // Set new password (will be hashed by model)
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        // Auto-verify email if resetting password
+        if (!user.isEmailVerified) {
+            user.isEmailVerified = true;
+            user.emailVerificationToken = undefined;
+            user.emailVerificationExpires = undefined;
+        }
+
+        await user.save();
+
+        res.json({ message: 'Password reset successful! You can now log in with your new password.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

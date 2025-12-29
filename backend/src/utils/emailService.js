@@ -172,6 +172,7 @@ const emailTemplates = {
                     .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
                     .feature { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #667eea; }
                     .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                    .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
                 </style>
             </head>
             <body>
@@ -212,6 +213,51 @@ const emailTemplates = {
             </html>
         `,
         text: `Welcome to MyDen!\n\nHi ${userName},\n\nYour account is now active! You can now:\n- Build your portfolio\n- Set price alerts\n- Get AI recommendations\n- Track performance\n\nLogin and start investing!`
+    }),
+
+    // Forgot Password Email
+    forgotPassword: (userName, resetLink) => ({
+        subject: '🔑 Reset Your Password - MyDen',
+        html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: linear-gradient(135deg, #f53844 0%, #42378f 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                    .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #f53844 0%, #42378f 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
+                    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Reset Password</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Hi ${userName},</h2>
+                        <p>You requested to reset your password.</p>
+                        <p>Click the button below to reset it:</p>
+                        <center>
+                            <a href="${resetLink}" class="button">Reset Password</a>
+                        </center>
+                        <p>Or copy this link:</p>
+                        <p style="background: #e0e0e0; padding: 10px; border-radius: 5px; word-break: break-all;">
+                            ${resetLink}
+                        </p>
+                        <p><strong>This link expires in 1 hour.</strong></p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                    </div>
+                    <div class="footer">
+                        <p>© 2024 MyDen Investment App. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `,
+        text: `Hi ${userName},\n\nReset your password here: ${resetLink}\n\nThis link expires in 1 hour.\n\nIf you didn't request this, ignore this email.`
     })
 };
 
@@ -252,6 +298,12 @@ module.exports = {
 
     sendWelcomeEmail: async (email, userName) => {
         const template = emailTemplates.welcome(userName);
+        return await sendEmail(email, template);
+    },
+
+    sendPasswordResetEmail: async (email, userName, token) => {
+        const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${token}`;
+        const template = emailTemplates.forgotPassword(userName, resetLink);
         return await sendEmail(email, template);
     }
 };

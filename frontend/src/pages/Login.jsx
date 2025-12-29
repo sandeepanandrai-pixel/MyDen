@@ -91,6 +91,10 @@ const Login = () => {
                             />
                         </div>
                     </div>
+                    <div className="flex justify-end mt-2">
+                        <Link to="/forgot-password" className="text-sm text-blue-500 hover:text-blue-400">Forgot Password?</Link>
+                    </div>
+
 
                     <div className="flex justify-center">
                         <ReCAPTCHA
@@ -110,8 +114,8 @@ const Login = () => {
                         Don't have an account? <a href="/signup" className="text-blue-500 hover:text-blue-400 font-medium">Sign Up</a>
                     </p>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
