@@ -12,6 +12,9 @@ const userRoutes = require('./routes/user');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
+// Trust the first proxy (required for Railway/Vercel/Heroku)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 5000;
 
 // Security Middleware
