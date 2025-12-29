@@ -19,7 +19,8 @@ const generateVerificationToken = () => {
 // @route   POST /api/auth/register
 // @access  Public
 exports.registerUser = async (req, res) => {
-    const { firstName, lastName, email, phone, password, role } = req.body;
+    const { firstName, lastName, email: rawEmail, phone, password, role } = req.body;
+    const email = rawEmail.toLowerCase().trim();
 
     try {
         const userExists = await User.findOne({ email });
@@ -177,7 +178,8 @@ exports.resendVerification = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 exports.loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { email: rawEmail, password } = req.body;
+    const email = rawEmail.toLowerCase().trim();
 
     try {
         const user = await User.findOne({ email });

@@ -36,7 +36,8 @@ const createAdminUser = async () => {
         console.log('📝 Enter Admin User Details:\n');
         const firstName = await question('First Name: ');
         const lastName = await question('Last Name: ');
-        const email = await question('Email: ');
+        const rawEmail = await question('Email: ');
+        const email = rawEmail.toLowerCase().trim();
         const phone = await question('Phone (optional): ');
         const password = await question('Password: ');
 
