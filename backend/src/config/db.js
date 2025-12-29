@@ -5,6 +5,8 @@ const connectDB = async () => {
         const conn = await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            useCreateIndex: true, // Fix for ensureIndex deprecation warning
+            useFindAndModify: false, // Fix for findAndModify deprecation warning
             maxPoolSize: 10,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
