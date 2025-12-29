@@ -68,10 +68,19 @@ exports.registerUser = async (req, res) => {
 
             if (!emailResult.success) {
                 console.error('Failed to send verification email:', emailResult.error);
+                // TEMPORARY FIX: Auto-verify user if email fails (for Railway/cloud environments)
+                // TODO: Replace with proper transactional email service (SendGrid, Mailgun, etc)
+                user.isEmailVerified = true;
+                user.emailVerificationToken = undefined;
+                user.emailVerificationExpires = undefined;
+                await user.save();
+                console.warn(`⚠️  User ${email} auto-verified due to email service unavailability`);
             }
 
             res.status(201).json({
-                message: 'Registration successful! Please check your email to verify your account.',
+                message: emailResult.success
+                    ? 'Registration successful! Please check your email to verify your account.'
+                    : 'Registration successful! Your account has been verified automatically.',
                 user: {
                     _id: user._id,
                     firstName: user.firstName,
