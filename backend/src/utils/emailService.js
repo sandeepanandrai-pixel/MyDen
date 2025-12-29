@@ -5,11 +5,17 @@ const createTransporter = () => {
     // Use Gmail or your preferred email service
     // For production, use services like SendGrid, AWS SES, or Mailgun
     return nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // use SSL
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD // Use App Password for Gmail
-        }
+            pass: process.env.EMAIL_PASSWORD
+        },
+        // Connection settings
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 5000,    // 5 seconds
+        socketTimeout: 10000      // 10 seconds
     });
 };
 
