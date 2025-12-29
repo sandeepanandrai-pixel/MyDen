@@ -133,9 +133,14 @@ const Signup = () => {
                         Create Account
                     </button>
 
-                    <p className="text-center text-slate-400 text-sm mt-4">
-                        Already have an account? <a href="/login" className="text-blue-500 hover:text-blue-400 font-medium">Log In</a>
-                    </p>
+                    <div className="text-center mt-6 space-y-2">
+                        <p className="text-slate-400 text-sm">
+                            Already have an account? <a href="/login" className="text-blue-500 hover:text-blue-400 font-medium">Log In</a>
+                        </p>
+                        <p className="text-sm">
+                            <a href="/" className="text-slate-500 hover:text-slate-400 transition-colors">Back to Home</a>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

@@ -12,6 +12,7 @@ import History from './pages/History';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
+import ResendVerification from './pages/ResendVerification';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
@@ -26,6 +27,7 @@ const AppContent = () => {
       <Route exact path="/login" component={Login} />
       <Route exact path="/signup" component={Signup} />
       <Route exact path="/forgot-password" component={ForgotPassword} />
+      <Route exact path="/resend-verification" component={ResendVerification} />
       <Route exact path="/reset-password/:token" component={ResetPassword} />
 
       {/* Private/Protected Routes wrapped in Layout */}

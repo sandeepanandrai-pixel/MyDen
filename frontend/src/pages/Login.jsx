@@ -91,12 +91,12 @@ const Login = () => {
                             />
                         </div>
                     </div>
-                    <div className="flex justify-end mt-2">
-                        <Link to="/forgot-password" className="text-sm text-blue-500 hover:text-blue-400">Forgot Password?</Link>
+                    <div className="flex justify-between mt-2 text-sm">
+                        <Link to="/resend-verification" className="text-blue-500 hover:text-blue-400">Resend Verification?</Link>
+                        <Link to="/forgot-password" className="text-blue-500 hover:text-blue-400">Forgot Password?</Link>
                     </div>
 
-
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mt-6">
                         <ReCAPTCHA
                             sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
                             onChange={(token) => setCaptchaToken(token)}
@@ -104,15 +104,20 @@ const Login = () => {
                         />
                     </div>
 
-                    {error && <div className="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded-lg">{error}</div>}
+                    {error && <div className="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded-lg mt-4">{error}</div>}
 
-                    <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20">
+                    <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 mt-6">
                         Sign In as {role.charAt(0).toUpperCase() + role.slice(1)}
                     </button>
 
-                    <p className="text-center text-slate-400 text-sm mt-4">
-                        Don't have an account? <a href="/signup" className="text-blue-500 hover:text-blue-400 font-medium">Sign Up</a>
-                    </p>
+                    <div className="text-center mt-6 space-y-2">
+                        <p className="text-slate-400 text-sm">
+                            Don't have an account? <a href="/signup" className="text-blue-500 hover:text-blue-400 font-medium">Sign Up</a>
+                        </p>
+                        <p className="text-sm">
+                            <a href="/" className="text-slate-500 hover:text-slate-400 transition-colors">Back to Home</a>
+                        </p>
+                    </div>
                 </form>
             </div >
         </div >
