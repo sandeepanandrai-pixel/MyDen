@@ -8,16 +8,22 @@ const ResendVerification = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [autoVerified, setAutoVerified] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
         setError('');
         setLoading(true);
+        setAutoVerified(false);
 
         try {
             const { data } = await api.post('/auth/resend-verification', { email });
             setMessage(data.message);
+            // Check if user was auto-verified due to email service failure
+            if (data.autoVerified) {
+                setAutoVerified(true);
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to resend verification email');
         } finally {
@@ -38,12 +44,22 @@ const ResendVerification = () => {
 
                 {message ? (
                     <div className="text-center mb-6">
-                        <div className="bg-green-500/10 text-green-500 p-4 rounded-xl flex flex-col items-center">
-                            <Send size={32} className="mb-2" />
-                            <p>{message}</p>
+                        <div className={`${autoVerified ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500'} p-4 rounded-xl flex flex-col items-center`}>
+                            {autoVerified ? (
+                                <>
+                                    <Send size={32} className="mb-2" />
+                                    <p className="font-semibold mb-2">✅ Account Verified!</p>
+                                    <p className="text-sm">{message}</p>
+                                </>
+                            ) : (
+                                <>
+                                    <Send size={32} className="mb-2" />
+                                    <p>{message}</p>
+                                </>
+                            )}
                         </div>
                         <Link to="/login" className="block mt-6 text-blue-500 hover:text-blue-400 font-medium">
-                            Back to Login
+                            {autoVerified ? 'Go to Login →' : 'Back to Login'}
                         </Link>
                     </div>
                 ) : (

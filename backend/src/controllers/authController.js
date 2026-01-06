@@ -181,8 +181,18 @@ exports.resendVerification = async (req, res) => {
         );
 
         if (!emailResult.success) {
-            return res.status(500).json({
-                message: 'Failed to send verification email'
+            console.error('Failed to send reverification email:', emailResult.error);
+            // TEMPORARY FIX: Auto-verify user if email fails (for Railway/cloud environments)
+            // TODO: Replace with proper transactional email service (SendGrid, Mailgun, etc)
+            user.isEmailVerified = true;
+            user.emailVerificationToken = undefined;
+            user.emailVerificationExpires = undefined;
+            await user.save();
+            console.warn(`⚠️  User ${email} auto-verified during reverification due to email service unavailability`);
+
+            return res.json({
+                message: 'Your account has been verified automatically. You can now log in.',
+                autoVerified: true
             });
         }
 
