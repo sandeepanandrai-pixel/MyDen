@@ -97,7 +97,7 @@ const AutoTrading = () => {
     };
 
     const handleDeactivate = async () => {
-        if (!confirm('Are you sure you want to deactivate your trading model?')) {
+        if (!window.confirm('Are you sure you want to deactivate your trading model?')) {
             return;
         }
 
@@ -111,7 +111,7 @@ const AutoTrading = () => {
     };
 
     const handleCloseAll = async () => {
-        if (!confirm('Are you sure you want to close all positions immediately?')) {
+        if (!window.confirm('Are you sure you want to close all positions immediately?')) {
             return;
         }
 
@@ -245,8 +245,8 @@ const AutoTrading = () => {
                                         key={model.type}
                                         onClick={() => setSelectedModel(model)}
                                         className={`bg-slate-800 rounded-2xl p-6 cursor-pointer transition-all border-2 ${isSelected
-                                                ? 'border-blue-500 shadow-lg shadow-blue-500/20'
-                                                : 'border-slate-700 hover:border-slate-600'
+                                            ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+                                            : 'border-slate-700 hover:border-slate-600'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3 mb-4">
