@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, FileText, BarChart, Menu, X, Search, Bell, User } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, PieChart, Settings, LogOut, FileText, BarChart, Menu, X, Search, Bell, User, Activity } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NotificationCenter from './NotificationCenter';
 import AIChatAssistant from './AIChatAssistant';
@@ -113,6 +113,14 @@ const Layout = ({ children }) => {
                         label="History"
                         active={location.pathname === '/history'}
                         to="/history"
+                        isMobile={true}
+                        closeSidebar={closeSidebar}
+                    />
+                    <SidebarItem
+                        icon={Activity}
+                        label="Auto Trading"
+                        active={location.pathname === '/auto-trading'}
+                        to="/auto-trading"
                         isMobile={true}
                         closeSidebar={closeSidebar}
                     />

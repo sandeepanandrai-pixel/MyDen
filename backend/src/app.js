@@ -9,6 +9,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const portfolioRoutes = require('./routes/portfolio');
 const userRoutes = require('./routes/user');
+const autoTradingRoutes = require('./routes/autoTrading');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
@@ -86,9 +87,16 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/auto-trading', autoTradingRoutes);
 // app.use('/api/strategies', strategyRoutes); // Temporarily disabled
 
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+
+    // Initialize trading scheduler
+    const tradingScheduler = require('./services/tradingScheduler');
+    tradingScheduler.initialize().catch(err => {
+        console.error('Failed to initialize trading scheduler:', err);
+    });
 });

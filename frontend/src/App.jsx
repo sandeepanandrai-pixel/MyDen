@@ -17,6 +17,7 @@ import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import SmartAlerts from './pages/SmartAlerts';
+import AutoTrading from './pages/AutoTrading';
 
 // Component wrapper to handle routing structure
 const AppContent = () => {
@@ -42,6 +43,7 @@ const AppContent = () => {
             <PrivateRoute exact path="/settings" component={Settings} />
             <PrivateRoute exact path="/profile" component={Profile} />
             <PrivateRoute exact path="/alerts" component={SmartAlerts} />
+            <PrivateRoute exact path="/auto-trading" component={AutoTrading} />
           </Switch>
         </Layout>
       </Route>
